@@ -17,7 +17,7 @@ module stream_rescale #(
     input logic m_ready_in
 );
 
-// размер буфера
+// buffer
 localparam BUFFER_SIZE = S_KEEP_WIDTH * 4;
 localparam PTR_WIDTH = $clog2(BUFFER_SIZE);
 
@@ -26,13 +26,13 @@ logic [T_DATA_WIDTH-1:0] buffer [BUFFER_SIZE-1:0];
 logic [BUFFER_SIZE-1:0] buffer_keep;
 logic buffer_has_last;
 
-// Указатели и счетчик
+// pointers
 logic [PTR_WIDTH:0] wr;
 logic [PTR_WIDTH:0] rd;
 logic [PTR_WIDTH:0] buffer_cnt;
 logic [PTR_WIDTH-1:0] last_ptr;
 
-// Подсчет валидных входных данных
+
 logic [$clog2(S_KEEP_WIDTH+1)-1:0] valid_data_cnt;
 
 always_comb begin
@@ -42,14 +42,14 @@ always_comb begin
     end
 end
 
-// Логика готовности приема
+// logic for s_ready_out
 assign s_ready_out = (buffer_cnt + valid_data_cnt) <= BUFFER_SIZE;
 
-// Логика валидности передачи
+// logic for m_valid_out and m_last_out
 assign m_valid_out = (buffer_cnt >= M_KEEP_WIDTH) || (buffer_has_last && buffer_cnt > 0);
 assign m_last_out = buffer_has_last && (buffer_cnt <= M_KEEP_WIDTH);
 
-// Запись в буфер
+// writing data in buffer
 always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         wr <= 0;
@@ -62,7 +62,7 @@ always_ff @(posedge clk or negedge rst_n) begin
             buffer_keep[i] <= 0;
         end
     end else begin
-        // Запись входных данных
+  
         if (s_valid_in && s_ready_out) begin
             for (int i = 0; i < S_KEEP_WIDTH; i++) begin
                 buffer_keep <= s_keep_in[i];
@@ -75,16 +75,16 @@ always_ff @(posedge clk or negedge rst_n) begin
             if (s_last_in) buffer_has_last <= 1'b1;
         end
         
-        // Чтение выходных данных
+
         if (m_valid_out && m_ready_in) begin
             rd <= rd + M_KEEP_WIDTH;
             if (buffer_cnt >= M_KEEP_WIDTH) begin
                 buffer_cnt <= buffer_cnt - M_KEEP_WIDTH;
             end else begin
-                buffer_cnt <= 0; // Последний неполный пакет
+                buffer_cnt <= 0; 
             end
             
-            // Сброс last флага после отправки последнего пакета
+            
             if (buffer_has_last && buffer_cnt <= M_KEEP_WIDTH) begin
                 buffer_has_last <= 1'b0;
             end
@@ -96,15 +96,15 @@ always_ff @(posedge clk or negedge rst_n) begin
     end
 end
 
-// Чтение из буфера (комбинационная логика)
+// reading from buffer
 always_comb begin
     for (int i = 0; i < M_KEEP_WIDTH; i++) begin
         if (i < buffer_cnt) begin
-            // Данные есть в буфере
+
             m_data_out[i] = buffer[rd + i];
             m_keep_out[i] = buffer_keep[rd + i];
         end else begin
-            // Данных нет - заполняем нулями
+
             m_data_out[i] = 0;
             m_keep_out[i] = 1'b0;
         end

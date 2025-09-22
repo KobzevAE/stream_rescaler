@@ -1,11 +1,11 @@
-module stream_rescale_tb_simple;                  // второй вариант
+module stream_rescale_tb_simple;                 
 
-// Параметры
+
 parameter T_DATA_WIDTH = 1;
 parameter S_KEEP_WIDTH = 3;
 parameter M_KEEP_WIDTH = 6;
 
-// Сигналы
+
 logic clk;
 logic rst_n;
 logic [T_DATA_WIDTH-1:0] s_data_in [S_KEEP_WIDTH-1:0];
@@ -19,19 +19,34 @@ logic m_last_out;
 logic m_valid_out;
 logic m_ready_in;
 
-// Тактовый сигнал
+
 always #5 clk = ~clk;
 
-// DUT
-stream_rescale #(
-    .T_DATA_WIDTH(T_DATA_WIDTH),
-    .S_KEEP_WIDTH(S_KEEP_WIDTH),
-    .M_KEEP_WIDTH(M_KEEP_WIDTH)
-) dut (.*);
 
-// Тест
+    stream_rescale #(
+            .T_DATA_WIDTH(T_DATA_WIDTH),
+            .S_KEEP_WIDTH(S_KEEP_WIDTH),
+            .M_KEEP_WIDTH(M_KEEP_WIDTH)    
+    ) uut(
+    
+        .clk(clk),
+        .rst_n(rst_n),
+        .s_data_in(s_data_in), /// slave
+        .s_keep_in(s_keep_in),
+        .s_last_in(s_last_in),
+        .s_valid_in(s_valid_in),
+        .s_ready_out(s_ready_out),
+    
+        .m_data_out(m_data_out),  /// master
+        .m_keep_out(m_keep_out),
+        .m_last_out(m_last_out),
+        .m_valid_out(m_valid_out),
+        .m_ready_in(m_ready_in)
+    
+    );
+
 initial begin
-    // Инициализация
+
     clk = 0;
     rst_n = 1;
     s_valid_in = 0;
@@ -42,7 +57,7 @@ initial begin
     s_data_in[2] = 0;
     s_keep_in = 0;
     
-    // Сброс
+
     rst_n = 0;
     #20;
     rst_n = 1;
@@ -60,7 +75,7 @@ initial begin
     @(posedge clk);
     s_valid_in = 0;
     
-    // Ждем выходные данные
+
     #100;
     
 
@@ -75,7 +90,7 @@ initial begin
     @(posedge clk);
     s_valid_in = 0;
     
-    // Ждем выходные данные
+
     #100;
      @(posedge clk);
     s_valid_in = 1;
@@ -88,7 +103,7 @@ initial begin
     @(posedge clk);
     s_valid_in = 0;
     
-    // Ждем выходные данные
+
     #100;  
     @(posedge clk);
     s_valid_in = 1;
@@ -101,7 +116,7 @@ initial begin
     @(posedge clk);
     s_valid_in = 0;
     
-    // Завершение
+
     #100;
     $finish;
 end
