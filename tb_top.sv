@@ -2,8 +2,8 @@ module stream_rescale_tb_simple;
 
 
 parameter T_DATA_WIDTH = 1;
-parameter S_KEEP_WIDTH = 3;
-parameter M_KEEP_WIDTH = 6;
+parameter S_KEEP_WIDTH = 8;
+parameter M_KEEP_WIDTH = 3;
 
 
 logic clk;
@@ -44,7 +44,46 @@ always #5 clk = ~clk;
         .m_ready_in(m_ready_in)
     
     );
+    
+/*always @(s_data_in) begin
+ $display("data == %p       time == %t", s_data_in, $time());
+end*/
 
+/*task initial_setup();
+    clk = 0;
+    rst_n = 1;
+    s_valid_in = 0;
+    s_last_in = 0;
+    m_ready_in = 1;
+    s_data_in[0] = 0;
+    s_data_in[1] = 0;
+    s_data_in[2] = 0;
+    s_keep_in = 0;
+
+    rst_n = 0;
+    #20;
+    rst_n = 1;
+    #10;
+endtask
+*/
+/*task packet ();
+input [T_DATA_WIDTH-1:0]data [S_KEEP_WIDTH-1:0] ;
+input [S_KEEP_WIDTH-1:0] keep;
+begin
+    @(posedge clk);
+    s_valid_in = 1;
+    for (int i=0;i<=S_KEEP_WIDTH;i++) begin
+        s_data_in[i] = data[i];
+    end
+    s_keep_in = keep;
+    s_last_in = 0;
+    
+    @(posedge clk);
+    s_valid_in = 0;
+
+    #100;
+end
+endtask */
 initial begin
 
     clk = 0;
@@ -56,18 +95,122 @@ initial begin
     s_data_in[1] = 0;
     s_data_in[2] = 0;
     s_keep_in = 0;
-    
+    s_data_in[3] = 0;
+    s_data_in[4] = 0;
+    s_data_in[5] = 0;
+    s_data_in[6] = 0;
+    s_data_in[7] = 0;   
 
     rst_n = 0;
     #20;
     rst_n = 1;
     #10;
+
+//initial_setup();
+
+    @(posedge clk);
+    s_valid_in = 1;
+    m_ready_in = 1;
+    s_data_in[0] = 0;
+    s_data_in[1] = 0;
+    s_data_in[2] = 1;
+    s_data_in[3] = 1;
+    s_data_in[4] = 0;
+    s_data_in[5] = 0;
+    s_data_in[6] = 1;
+    s_data_in[7] = 1;
+    s_keep_in = 8'b11111111;
+    s_last_in = 0;
+    
+    @(posedge clk);
+    s_valid_in = 0;
     
 
+    #100;
+//    packet ({1'b1,1'b1,1'b1}, 3'b111);
+    
+
+   /* @(posedge clk);
+    s_valid_in = 1;
+    s_data_in[0] = 1'b1;
+    s_data_in[1] = 1'b0;
+    s_data_in[2] = 1'b1;
+    s_keep_in = 3'b111;
+    s_last_in = 0;
+    
+    @(posedge clk);
+    s_valid_in = 0;
+    
+    
+*//*     packet ({1'b1,1'b0,1'b1}, 3'b111);*//*
+    
+    
+
+    #100;
+    
+    @(posedge clk);
+    s_valid_in = 1;
+    s_data_in[0] = 1'b1;
+    s_data_in[1] = 1'b1;
+    s_data_in[2] = 4'b1;
+    s_keep_in = 3'b100;
+    s_last_in = 1;
+    
+    @(posedge clk);
+    s_valid_in = 0;
+    
+
+    #100;
+    
+     @(posedge clk);
+    s_valid_in = 1;
+    s_data_in[0] = 1'b0;
+    s_data_in[1] = 1'b1;
+    s_data_in[2] = 1'b1;
+    s_keep_in = 3'b100;
+    s_last_in = 0;
+    
+    
+    @(posedge clk);
+    s_valid_in = 0;
+    
+
+    #100; 
+   *//* 
+    rst_n = 0;
+    #20;
+    rst_n = 1;
+    #10; 
+    *//*
+    
     @(posedge clk);
     s_valid_in = 1;
     s_data_in[0] = 1'b1;
     s_data_in[1] = 1'b0;
+    s_data_in[2] = 1'b0;
+    s_keep_in = 3'b100;
+    s_last_in = 0;
+    
+    @(posedge clk);
+    s_valid_in = 0;
+    
+     #100;
+     @(posedge clk);
+    s_valid_in = 1;
+    s_data_in[0] = 1'b0;
+    s_data_in[1] = 1'b0;
+    s_data_in[2] = 1'b1;
+    s_keep_in = 3'b111;
+    s_last_in = 1;
+    
+    @(posedge clk);
+    s_valid_in = 0;
+    
+    #100;
+    @(posedge clk);
+    s_valid_in = 1;
+    s_data_in[0] = 1'b1;
+    s_data_in[1] = 1'b1;
     s_data_in[2] = 4'b1;
     s_keep_in = 3'b111;
     s_last_in = 0;
@@ -88,22 +231,17 @@ initial begin
     s_last_in = 1;
     
     @(posedge clk);
-    s_valid_in = 0;
+    s_valid_in = 0;*/
+    
+    
     
 
     #100;
-     @(posedge clk);
-    s_valid_in = 1;
-    s_data_in[0] = 1'b1;
-    s_data_in[1] = 1'b1;
-    s_data_in[2] = 1'b1;
-    s_keep_in = 3'b111;
-    s_last_in = 0;
     
-    @(posedge clk);
-    s_valid_in = 0;
     
-
+  
+    
+/*
     #100;  
     @(posedge clk);
     s_valid_in = 1;
@@ -115,10 +253,7 @@ initial begin
     
     @(posedge clk);
     s_valid_in = 0;
-    
-
+*/
     #100;
     $finish;
 end
-
-endmodule
